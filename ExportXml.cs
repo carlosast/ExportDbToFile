@@ -3,107 +3,105 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Translogic.Modules.Core.Spd;
-using Translogic.Modules.Core.Spd.BLL;
-using Translogic.Modules.Core.Spd.Data;
 using Speed.Common;
+using System.Text;
+using System.ComponentModel;
 
-namespace ExportarCteXml
+namespace ExportDbToFile
 {
     public class ExportXml
     {
         StreamWriter writerOk;
         StreamWriter writerError;
-        public int Export(string dir, string chaves, string select, ProgressBar progressBar, Label lblMessage)
+        public int Export(Database db, BackgroundWorker worker, string dir, string select, bool columnFileNames, bool exportNulls, Label lblMessage, string extension)
         {
             int count = 0;
+            extension = extension.Replace(".", "");
 
             using (writerOk = new StreamWriter(Path.Combine(dir, "_Export_OK.txt"), false))
             {
                 using (writerError = new StreamWriter(Path.Combine(dir, "_Export_Error.txt"), false))
                 {
-                    using (var db = Dbs.NewDb(Db.Translogic))
+                    lblMessage.Text = "Consultando ...";
+                    lblMessage.Update();
+
+                    select = select.Trim();
+                    if (select.EndsWith(";"))
+                        select = select.Substring(0, select.Length - 1);
+
+                    using (var reader = db.ExecuteReader(select, 0))
                     {
-                        var _chaves = ParseChaves(chaves);
-                        foreach (var chave in _chaves)
+                        while (reader.Read())
                         {
-                            var cte = BL_Cte.SelectSingle(db, new Cte { ChaveCte = chave });
-                            if (cte != null)
+                            if (worker.CancellationPending)
                             {
-                                count++;
-                                ExportCte(db, dir, cte);
+                                return count;
                             }
-                        }
 
-                        lblMessage.Text = "Consultando ...";
-                        lblMessage.Update();
+                            count++;
 
-                        var ids = GetSelect(select);
-
-                        if (ids.Any())
-                        {
-                            progressBar.Minimum = 0;
-                            progressBar.Maximum = ids.Count;
-
-                            foreach (var id in ids)
+                            try
                             {
-                                var cte = BL_Cte.SelectByPk(db, id);
-                                if (cte != null)
+                                if (count % 10 == 0)
                                 {
-                                    progressBar.Value = count;
-                                    progressBar.Update();
-
-                                    count++;
-
-                                    lblMessage.Text = string.Format("Processando {0} de {1}", count, ids.Count);
+                                    lblMessage.Text = string.Format("Processados {0} registros", count);
                                     lblMessage.Update();
+                                }
 
-                                    ExportCte(db, dir, cte);
+                                string fileName = null;
+                                object value = null;
+
+                                for (int i = 0; i < reader.FieldCount; i += (columnFileNames ? 2 : 1))
+                                {
+                                    if (columnFileNames)
+                                    {
+                                        fileName = reader.GetValue(i) as string;
+                                        if (fileName == null)
+                                            fileName = reader.GetName(i) + "_" + count;
+                                        value = reader.GetValue(i + 1);
+                                    }
+                                    else
+                                    {
+                                        fileName = reader.GetName(i) + "_" + count;
+                                        value = reader.GetValue(i);
+                                    }
+
+                                    if (!exportNulls && (value == DBNull.Value || value == null))
+                                    {
+                                        continue;
+                                    }
+
+                                    fileName = Path.Combine(dir, Speed.IO.FileTools.ToValidPath(fileName));
+
+                                    if (!string.IsNullOrWhiteSpace(extension) && Path.GetExtension(fileName).Replace(".", "").ToLower() != extension)
+                                    {
+                                        fileName += "." + extension;
+                                    }
+
+                                    if (value is byte[])
+                                    {
+                                        File.WriteAllBytes(fileName, (byte[])value);
+                                    }
+                                    else
+                                    {
+                                        File.WriteAllText(fileName, value.ToString(), UTF8Encoding.UTF8);
+                                    }
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                LogError(ex.Message + "\r\n" + ex.StackTrace);
+                            }
                         }
+
+                        lblMessage.Text = string.Format("Processados {0} registros", count);
+                        lblMessage.Update();
                     }
                 }
             }
+
             return count;
-        }
-
-        void ExportCte(Database db, string dir, Cte cte)
-        {
-            var sql = "SELECT ARQUIVO_XML FROM CTE_ARQUIVO WHERE ID_CTE = " + cte.IdCte;
-            string xml = db.ExecuteScalar(sql) as string;
-
-            if (string.IsNullOrWhiteSpace(xml))
-            {
-                LogError(cte.ChaveCte);
-            }
-            else
-            {
-                File.WriteAllText(Path.Combine(dir, cte.ChaveCte + ".xml"), xml, System.Text.UTF32Encoding.UTF8);
-                LogOk(cte.ChaveCte);
-            }
-        }
-
-        List<string> ParseChaves(string chaves)
-        {
-            if (chaves == null || chaves == string.Empty)
-                return new List<string>();
-
-            return chaves.Split(new char[] { '\r', '\n', ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => p.Trim()).Distinct(p => p).ToList();
-        }
-
-        List<decimal> GetSelect(string select)
-        {
-            if (select == null || select == string.Empty)
-                return new List<decimal>();
-
-            if (select.EndsWith(";"))
-                select = select.Substring(0, select.Length - 1);
-
-            return Dbs.Execute(Db.Translogic, (db) => db.ExecuteArray1D<decimal>(select)).ToList();
         }
 
         void LogOk(string message)
