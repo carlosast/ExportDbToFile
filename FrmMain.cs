@@ -15,6 +15,9 @@ namespace ExportDbToFile
     public partial class FrmMain : Form
     {
 
+        int count;
+        DateTime date;
+
         public FrmMain()
         {
             InitializeComponent();
@@ -96,14 +99,14 @@ and rownum <= 1000;";
                 using (var f = new FrmConnections())
                     f.ShowDialog();
 
-                var cur = cboConnections.SelectedValue;
+                var cur = cboConnections.SelectedItem;
                 cboConnections.DataSource = null;
                 var connections = Settings.Load();
                 cboConnections.DisplayMember = "Name";
                 cboConnections.DataSource = connections;
                 if (cur != null && connections.Any())
                 {
-                    cboConnections.SelectedValue = cur;
+                    cboConnections.SelectedItem = cur;
                 }
             });
         }
@@ -130,13 +133,11 @@ and rownum <= 1000;";
             string select = txtSelect.Text.Trim();
 
             var exp = new ExportXml();
-            DateTime date = DateTime.Now;
+            date = DateTime.Now;
 
             using (var db = Sys.NewDb(connection.GetProviderType(), connection.ConnectionString))
             {
-                int count = exp.Export(db, worker, dir, select, cboExportType.SelectedIndex == 1, !chkNotExportNulls.Checked, lblMessage, txtExtension.Text);
-                string msg = "Exportados " + count + " arquivos. Tempo: " + DateTime.Now.Subtract(date);
-                Program.ShowInformation(msg);
+                count = exp.Export(db, worker, dir, select, cboExportType.SelectedIndex == 1, !chkNotExportNulls.Checked, lblMessage, txtExtension.Text);
             }
         }
 
@@ -145,6 +146,8 @@ and rownum <= 1000;";
             panProgress.Visible = false;
             panInput.Enabled = true;
 
+            string msg = "Exportados " + count + " arquivos. Tempo: " + DateTime.Now.Subtract(date);
+            Program.ShowInformation(msg);
         }
     }
 
