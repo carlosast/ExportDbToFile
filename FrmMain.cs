@@ -32,7 +32,7 @@ namespace ExportDbToFile
             cboConnections.Sorted = true;
             cboConnections.DataSource = Settings.Load();
 
-            cboExportType.SelectedIndex = 0;
+            cboExportType.SelectedIndex = 1;
 
             Show();
 
@@ -49,7 +49,7 @@ where
     and c.sigla_uf_ferrovia in ('MT','MS','SP')
     AND C.SITUACAO_ATUAL = 'AUT'
 
-and rownum <= 1000;";
+-- and rownum <= 1000;";
 
             txtDirectory.Text = @"D:\temp\ExportCtes";
 
@@ -147,7 +147,7 @@ and rownum <= 1000;";
             panInput.Enabled = true;
 
             string msg = "Exportados " + count + " arquivos. Tempo: " + DateTime.Now.Subtract(date);
-            Program.ShowInformation(msg);
+            Program.ShowInformation(this, msg);
         }
     }
 

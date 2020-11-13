@@ -42,6 +42,11 @@ namespace ExportDbToFile
             MessageBox.Show(message, Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        public static void ShowInformation(Form form, string message)
+        {
+            MessageBox.Show(form, message, Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         public static bool Confirm(string message)
         {
             return MessageBox.Show(message, Title, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK;
