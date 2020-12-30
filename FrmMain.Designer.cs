@@ -45,10 +45,10 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblMessage = new System.Windows.Forms.Label();
             this.panInput = new System.Windows.Forms.Panel();
-            this.picHelp = new System.Windows.Forms.PictureBox();
-            this.worker = new System.ComponentModel.BackgroundWorker();
             this.label4 = new System.Windows.Forms.Label();
             this.txtExtension = new System.Windows.Forms.TextBox();
+            this.picHelp = new System.Windows.Forms.PictureBox();
+            this.worker = new System.ComponentModel.BackgroundWorker();
             this.groupBox2.SuspendLayout();
             this.panProgress.SuspendLayout();
             this.panInput.SuspendLayout();
@@ -192,7 +192,7 @@
             // 
             // lblMessage
             // 
-            this.lblMessage.BackColor = System.Drawing.Color.DarkBlue;
+            this.lblMessage.BackColor = System.Drawing.Color.SteelBlue;
             this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMessage.ForeColor = System.Drawing.Color.White;
@@ -224,6 +224,22 @@
             this.panInput.Size = new System.Drawing.Size(877, 386);
             this.panInput.TabIndex = 13;
             // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(12, 283);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(126, 20);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "Extensão";
+            // 
+            // txtExtension
+            // 
+            this.txtExtension.Location = new System.Drawing.Point(145, 283);
+            this.txtExtension.Name = "txtExtension";
+            this.txtExtension.Size = new System.Drawing.Size(68, 20);
+            this.txtExtension.TabIndex = 13;
+            this.txtExtension.Text = "xml";
+            // 
             // picHelp
             // 
             this.picHelp.Image = global::ExportDbToFile.Properties.Resources.Help;
@@ -240,22 +256,6 @@
             this.worker.WorkerSupportsCancellation = true;
             this.worker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.worker_DoWork);
             this.worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.worker_RunWorkerCompleted);
-            // 
-            // label4
-            // 
-            this.label4.Location = new System.Drawing.Point(12, 283);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(126, 20);
-            this.label4.TabIndex = 12;
-            this.label4.Text = "Extensão";
-            // 
-            // txtExtension
-            // 
-            this.txtExtension.Location = new System.Drawing.Point(145, 283);
-            this.txtExtension.Name = "txtExtension";
-            this.txtExtension.Size = new System.Drawing.Size(68, 20);
-            this.txtExtension.TabIndex = 13;
-            this.txtExtension.Text = "XML";
             // 
             // FrmMain
             // 

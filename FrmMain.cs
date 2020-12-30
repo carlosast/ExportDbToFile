@@ -36,20 +36,18 @@ namespace ExportDbToFile
 
             Show();
 
-#if !DEBUG2
+            txtDirectory.Text = @"c:\temp";
+#if DEBUG
             txtSelect.Text =
 @"select
-    C.CHAVE_CTE || '.xml', 
-    A.ARQUIVO_XML
+    C.CHAVE_CTE || '.pdf', 
+    A.ARQUIVO_PDF
 from
     translogic.cte c inner join cte_arquivo a on a.id_cte = c.id_cte
 where
-    c.data_cte between to_Date('01/08/2019 00:00:00','dd/mm/yyyy hh24:mi:ss')
-    and to_Date('31/07/2020 23:59:59','dd/mm/yyyy hh24:mi:ss')
-    and c.sigla_uf_ferrovia in ('MT','MS','SP')
+    c.data_cte between to_Date('01/01/2018 00:00:00','dd/mm/yyyy hh24:mi:ss') and to_Date('31/12/2018 23:59:59','dd/mm/yyyy hh24:mi:ss')
     AND C.SITUACAO_ATUAL = 'AUT'
-
--- and rownum <= 1000;";
+";
 
             txtDirectory.Text = @"D:\temp\ExportCtes";
 
@@ -137,7 +135,7 @@ where
 
             using (var db = Sys.NewDb(connection.GetProviderType(), connection.ConnectionString))
             {
-                count = exp.Export(db, worker, dir, select, cboExportType.SelectedIndex == 1, !chkNotExportNulls.Checked, lblMessage, txtExtension.Text);
+                count = exp.Export(db, worker, dir, select, cboExportType.SelectedIndex == 1, !chkNotExportNulls.Checked, lblMessage, txtExtension.Text, out count);
             }
         }
 

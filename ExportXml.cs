@@ -14,9 +14,9 @@ namespace ExportDbToFile
     {
         StreamWriter writerOk;
         StreamWriter writerError;
-        public int Export(Database db, BackgroundWorker worker, string dir, string select, bool columnFileNames, bool exportNulls, Label lblMessage, string extension)
+        public int Export(Database db, BackgroundWorker worker, string dir, string select, bool columnFileNames, bool exportNulls, Label lblMessage, string extension, out int count)
         {
-            int count = 0;
+            count = 0;
             extension = extension.Replace(".", "");
 
             using (writerOk = new StreamWriter(Path.Combine(dir, "_Export_OK.txt"), false))
